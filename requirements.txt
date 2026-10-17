@@ -1,0 +1,38 @@
+# ── Core API ──────────────────────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+python-dotenv==1.0.1
+
+# ── AI / LLM ──────────────────────────────────────────────────────────────
+google-genai
+langgraph==0.2.34
+langchain-core==0.3.5
+
+# ── Graph ─────────────────────────────────────────────────────────────────
+networkx==3.3
+
+# ── GNN (PyTorch CPU-only, PyG CPU wheels) ────────────────────────────────
+torch==2.3.1
+torch-geometric==2.5.3
+
+# ── ML utilities ──────────────────────────────────────────────────────────
+scikit-learn==1.5.2
+scipy==1.14.1
+numpy==1.26.4
+
+# ── Visualisation / Evaluation Dashboard ──────────────────────────────────
+matplotlib==3.9.2
+seaborn==0.13.2
+plotly==5.24.1
+streamlit==1.38.0
+streamlit-mermaid==0.2.0
+
+# ── Data / Source Ingestion ───────────────────────────────────────────────
+requests==2.32.3
+feedparser==6.0.11
+youtube-transcript-api==0.6.2
+google-api-python-client==2.144.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────
+tenacity>=8.1.0,<9.0.0
