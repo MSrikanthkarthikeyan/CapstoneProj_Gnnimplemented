@@ -65,6 +65,7 @@ class BuildPathResponse(BaseModel):
     nodes: list
     edges: list
     mermaid: str
+    progress: Optional[dict] = None
 
 
 class AnswerRequest(BaseModel):
@@ -136,6 +137,7 @@ def build_path(req: BuildPathRequest):
         raise HTTPException(502, f"Failed to build knowledge graph: {e}")
 
     session_id = SessionStore.create(kg)
+    progress = get_progress(session_id)
 
     return BuildPathResponse(
         session_id=session_id,
@@ -143,6 +145,7 @@ def build_path(req: BuildPathRequest):
         nodes=[n.model_dump() for n in kg.nodes],
         edges=[e.model_dump() for e in kg.edges],
         mermaid=_graph_to_mermaid(kg),
+        progress=progress,
     )
 
 

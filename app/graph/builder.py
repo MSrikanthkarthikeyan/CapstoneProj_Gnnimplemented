@@ -117,16 +117,26 @@ def _call_gemini(goal: str, source_bundle: str, repair_note: str = "") -> str:
     if repair_note:
         user_content += f"\n\nIMPORTANT - fix this issue from your previous attempt: {repair_note}"
 
-    response = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=user_content,
-        config=types.GenerateContentConfig(
-            system_instruction=system,
-            max_output_tokens=4000,
-            response_mime_type="application/json"
-        )
-    )
-    return response.text
+    models_to_try = [settings.GEMINI_MODEL]
+    if settings.GEMINI_MODEL != "gemini-flash-latest":
+        models_to_try.append("gemini-flash-latest")
+
+    last_err = None
+    for m in models_to_try:
+        try:
+            response = client.models.generate_content(
+                model=m,
+                contents=user_content,
+                config=types.GenerateContentConfig(
+                    system_instruction=system,
+                    max_output_tokens=4000,
+                    response_mime_type="application/json"
+                )
+            )
+            return response.text
+        except Exception as e:
+            last_err = e
+    raise last_err
 
 
 def build_knowledge_graph(

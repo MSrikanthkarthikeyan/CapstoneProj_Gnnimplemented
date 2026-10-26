@@ -10,12 +10,14 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from app.config import settings
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=6))
 def _parse_feed(url: str):
-    feed = feedparser.parse(url)
-    if feed.bozo and not feed.entries:
-        raise RuntimeError(f"Failed to parse MIT OCW feed: {feed.bozo_exception}")
-    return feed
+    try:
+        feed = feedparser.parse(url)
+        return feed
+    except Exception:
+        class _Empty:
+            entries = []
+        return _Empty()
 
 
 def fetch_mit_ocw_materials(topic: str, max_results: int = 5) -> List[Dict]:

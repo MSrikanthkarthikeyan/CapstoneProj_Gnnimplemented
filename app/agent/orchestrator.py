@@ -62,6 +62,19 @@ def _client() -> genai.Client:
     return genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
+def _generate_with_fallback(client: genai.Client, contents: Any, config: types.GenerateContentConfig):
+    models = [settings.GEMINI_MODEL]
+    if settings.GEMINI_MODEL != "gemini-flash-latest":
+        models.append("gemini-flash-latest")
+    last_err = None
+    for m in models:
+        try:
+            return client.models.generate_content(model=m, contents=contents, config=config)
+        except Exception as e:
+            last_err = e
+    raise last_err
+
+
 def _strip_fences(text: str) -> str:
     text = text.strip()
     text = re.sub(r"^```(json)?", "", text).strip()
@@ -104,10 +117,10 @@ def generate_lesson_node(state: TutorState) -> TutorState:
         "materials, use plain language, include one concrete intuitive example, and end "
         "with a one-sentence takeaway. Do not include a quiz."
     )
-    resp = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(max_output_tokens=1200)
+    resp = _generate_with_fallback(
+        client,
+        prompt,
+        types.GenerateContentConfig(max_output_tokens=1200)
     )
     state["lesson"] = resp.text
     return state
@@ -125,10 +138,10 @@ def generate_quiz_node(state: TutorState) -> TutorState:
         '{"questions": [{"question": "...", "options": ["a","b","c","d"], '
         '"answer_index": 0, "explanation": "..."}]}'
     )
-    resp = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(
+    resp = _generate_with_fallback(
+        client,
+        prompt,
+        types.GenerateContentConfig(
             max_output_tokens=1500,
             response_mime_type="application/json"
         )
