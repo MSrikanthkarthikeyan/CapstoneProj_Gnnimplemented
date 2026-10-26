@@ -1,0 +1,8 @@
+{
+  "name": "learning-path-builder-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "cd web && npm install && npm run build"
+  }
+}
